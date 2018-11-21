@@ -33,8 +33,8 @@ public class IdGenerator extends SequenceStyleGenerator {
 
 	private static final long START_EPOCH = 1541030400000L; // 2018-11-1
 	private static final int TIMESTAMP_SHIFT = 23; // (64 - 41)
-	private static final int SHARD_SHIFT = 16; // (64 - 41 - 16)
-	private static final int ID_PER_MILLISECOND = 65536;
+	private static final int SHARD_SHIFT = 16; // (64 - 41 - 7)
+	private static final int ID_PER_MILLISECOND = 1 << SHARD_SHIFT; // ‭65535
 
 	public IdGenerator() {
 		shiftedShardId = shardId << SHARD_SHIFT;
