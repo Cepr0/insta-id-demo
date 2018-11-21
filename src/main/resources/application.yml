@@ -1,0 +1,40 @@
+shard-id: 1
+
+spring:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/insta_id_demo
+#    username: postgres
+#    password: postgres
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+#        temp.use_jdbc_metadata_defaults: false
+        order_inserts: true
+        order_updates: true
+        jdbc:
+#          lob.non_contextual_creation: true
+          batch_size: 20
+          fetch_size: 20
+          batch_versioned_data: true
+#    hibernate:
+#      ddl-auto: validate
+
+logging:
+  level:
+    jdbc:
+      sqlonly: fatal
+      resultsettable: info
+      sqltiming: info
+      audit: fatal
+      resultset: fatal
+      connection: fatal
+
+log4jdbc:
+  dump:
+    sql:
+      addsemicolon: true
+      maxlinelength: 0
+  trim:
+    sql:
+      extrablanklines: false
