@@ -48,25 +48,31 @@ public class IdGenerator extends SequenceStyleGenerator {
 	}
 
 	private int loadShardId() {
-		ClassLoader loader = ClassUtils.getDefaultClassLoader();
 
-		if (loader == null) {
-			throw new IllegalStateException("Could not obtain ClassLoader!");
+		String shardIdValue = System.getenv("SHARD_ID");
+
+		if (shardIdValue == null) {
+			ClassLoader loader = ClassUtils.getDefaultClassLoader();
+
+			if (loader == null) {
+				throw new IllegalStateException("Could not obtain ClassLoader!");
+			}
+
+			InputStream resStream = loader.getResourceAsStream("application.yml");
+			if (resStream == null) {
+				throw new IllegalStateException("Could not load application.yml!");
+			}
+			Properties props = new Properties();
+
+			try {
+				props.load(resStream);
+			} catch (IOException e) {
+				throw new IllegalStateException("Could not read from application.yml!", e);
+			}
+
+			shardIdValue = (String) props.get("shard-id");
 		}
 
-		InputStream resStream = loader.getResourceAsStream("application.yml");
-		if (resStream == null) {
-			throw new IllegalStateException("Could not load application.yml!");
-		}
-		Properties props = new Properties();
-
-		try {
-			props.load(resStream);
-		} catch (IOException e) {
-			throw new IllegalStateException("Could not read from application.yml!", e);
-		}
-
-		String shardIdValue = (String) props.get("shard-id");
 		int shardId;
 
 		if (shardIdValue == null) {
