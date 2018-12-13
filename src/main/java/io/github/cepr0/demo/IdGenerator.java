@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.HibernateException;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.id.enhanced.SequenceStyleGenerator;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.util.ClassUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.util.Properties;
 
 /**
  *
@@ -22,12 +24,8 @@ import java.io.Serializable;
  *                      timestamp                      shardId          id
  *                     1 per mills                     0 - 63   0 - ‭65535 per mills
  */
-@Component
 @Slf4j
 public class IdGenerator extends SequenceStyleGenerator {
-
-	@Value("${shard-id:0}")
-	private int shardId;
 
 	private int shiftedShardId;
 
@@ -37,6 +35,7 @@ public class IdGenerator extends SequenceStyleGenerator {
 	private static final int ID_PER_MILLISECOND = 1 << SHARD_SHIFT; // ‭65535
 
 	public IdGenerator() {
+		int shardId = loadShardId();
 		shiftedShardId = shardId << SHARD_SHIFT;
 	}
 
@@ -46,5 +45,40 @@ public class IdGenerator extends SequenceStyleGenerator {
 		return (System.currentTimeMillis() - START_EPOCH) << TIMESTAMP_SHIFT
 				| shiftedShardId
 				| generated % ID_PER_MILLISECOND;
+	}
+
+	private int loadShardId() {
+		ClassLoader loader = ClassUtils.getDefaultClassLoader();
+
+		if (loader == null) {
+			throw new IllegalStateException("Could not obtain ClassLoader!");
+		}
+
+		InputStream resStream = loader.getResourceAsStream("application.yml");
+		if (resStream == null) {
+			throw new IllegalStateException("Could not load application.yml!");
+		}
+		Properties props = new Properties();
+
+		try {
+			props.load(resStream);
+		} catch (IOException e) {
+			throw new IllegalStateException("Could not read from application.yml!", e);
+		}
+
+		String shardIdValue = (String) props.get("shard-id");
+		int shardId;
+
+		if (shardIdValue == null) {
+			shardId = 0;
+			log.warn("[w] 'shard-id' property has not been found. Used default 0 value.");
+		} else {
+			try {
+				shardId = Integer.valueOf(shardIdValue);
+			} catch (NumberFormatException e) {
+				throw new IllegalArgumentException("Could not convert 'shard-id' property to numeric.");
+			}
+		}
+		return shardId;
 	}
 }
