@@ -1,7 +1,7 @@
-shard-id: 3
-
 spring:
-#  datasource:
+  main:
+    allow-bean-definition-overriding: true
+  #  datasource:
 #    url: jdbc:postgresql://localhost:5432/insta_id_demo
 #    username: postgres
 #    password: postgres
@@ -29,6 +29,7 @@ logging:
       audit: fatal
       resultset: fatal
       connection: fatal
+    io.github.cepr0: debug
 
 log4jdbc:
   dump:
