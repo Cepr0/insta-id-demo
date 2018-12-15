@@ -1,9 +1,10 @@
 package io.github.cepr0.demo;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 
 import static java.util.Arrays.asList;
 
@@ -20,14 +21,13 @@ public class Application {
 		SpringApplication.run(Application.class, args);
 	}
 
-	@EventListener
-	public void onReady(ApplicationReadyEvent e) {
-		userRepo.saveAll(asList(
+	@Profile("!test")
+	@Bean
+	public CommandLineRunner demoData(UserRepo userRepo) {
+		return args -> userRepo.saveAll(asList(
 				new User("user1"),
 				new User("user2"),
 				new User("user3")
-		));
-
-		userRepo.findAll().forEach(System.out::println);
+		)).forEach(u -> System.out.println(Long.toBinaryString(u.getId())));
 	}
 }
