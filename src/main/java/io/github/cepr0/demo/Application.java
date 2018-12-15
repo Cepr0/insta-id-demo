@@ -11,12 +11,6 @@ import static java.util.Arrays.asList;
 @SpringBootApplication
 public class Application {
 
-	private final UserRepo userRepo;
-
-	public Application(UserRepo userRepo) {
-		this.userRepo = userRepo;
-	}
-
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
 	}

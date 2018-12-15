@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(InstaProperties.class)
 @ConditionalOnClass(IdGenerator.class)
 public class InstaConfig {
-//	@Getter private static int shardId;
 
 	public InstaConfig(InstaProperties properties) {
 		InstagramStyleIdGenerator.getInstance().setShardId(properties.getShardId());
